@@ -2,6 +2,8 @@
 
 「序川」的轻量静态作品站，用来展示 App、个人工作流和多 Agent 开发实践，并保留后续记录入口。
 
+线上地址：<https://xulimeng2022.github.io/seqriver-portfolio/>
+
 ## 本地运行
 
 ```powershell
@@ -73,4 +75,5 @@ npm run build
 5. 确认标题、分享预览、X 链接和项目链接都使用“序川”品牌资料后，再绑定正式域名。
 
 `netlify.toml` 已包含构建配置和基础安全、缓存响应头。当前仓库不自动推送、不自动部署。
+
 
