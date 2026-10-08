@@ -154,7 +154,7 @@ export function renderPage(data = siteData) {
         ${chapterHeading("03", "关于零页", "about-title", "边学边做，持续往后翻。")}
         <div class="about-body">
           <div class="about-copy">${data.about.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
-            <div class="about-links">${externalLink(data.xUrl, "在 X 继续交流")}${externalLink(data.githubUrl, "GitHub")}</div>
+            <div class="about-links">${externalLink(data.xUrl, "在 X 继续交流")}${externalLink(data.githubUrl, "GitHub")}${externalLink(data.personalSiteUrl, "个人介绍")}</div>
           </div>
           <aside class="about-aside" aria-label="正在学习与探索">
             <p class="aside-label">正在学习与探索</p>

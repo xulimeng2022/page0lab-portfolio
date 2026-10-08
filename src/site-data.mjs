@@ -8,6 +8,7 @@ export const siteData = {
   xUrl: "https://x.com/page0lab",
   xHandle: "@page0lab",
   githubUrl: "https://github.com/xulimeng2022",
+  personalSiteUrl: "https://xulimeng2022.github.io/",
   brand: {
     image: "./assets/lingye-zero.png",
     alt: "炭黑切面的汉字零，右下方由电光蓝像素继续构建",
