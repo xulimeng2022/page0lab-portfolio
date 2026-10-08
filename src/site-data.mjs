@@ -4,7 +4,7 @@ export const siteData = {
   title: "零页｜从第 0 页开始，持续构建",
   description:
     "大一学生，学着写代码，也学着把想法做成真的东西。记录 AI、编程、产品，以及那些不太完美但真实的进度。",
-  productionUrl: "https://xulimeng2022.github.io/seqriver-portfolio/",
+  productionUrl: "https://xulimeng2022.github.io/page0lab-portfolio/",
   xUrl: "https://x.com/page0lab",
   xHandle: "@page0lab",
   githubUrl: "https://github.com/xulimeng2022",

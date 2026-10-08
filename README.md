@@ -59,6 +59,6 @@ npm run build
 
 ## 部署边界
 
-仓库原 GitHub Pages 地址为 https://xulimeng2022.github.io/seqriver-portfolio/，当前 MVP 沿用它作为正式 URL 配置；本次沿用现有仓库与网址发布，不重命名仓库或变更域名。
+GitHub 仓库为 https://github.com/xulimeng2022/page0lab-portfolio，正式网站为 https://xulimeng2022.github.io/page0lab-portfolio/。仓库名与零页 X 账号 @page0lab 保持一致。
 
 `docs/` 是 GitHub Pages 部署目录，使用 `npm run build:pages` 更新静态产物；推送到 `main` 后由 GitHub Pages 构建上线。Netlify 则使用现有 `netlify.toml`，发布目录为 `dist/`。
