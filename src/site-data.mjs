@@ -1,31 +1,32 @@
 // 站点资料集中维护入口：文案、链接、文章与项目信息都从这里读取。
 export const siteData = {
-  name: "序川",
-  title: "序川｜用 AI 做真正用得上的工具",
+  name: "零页",
+  title: "零页｜从第 0 页开始，持续构建",
   description:
-    "序川的个人作品站，记录 Android 应用、Obsidian 工作流、多 Agent 开发与学习实践。",
+    "大一学生，学着写代码，也学着把想法做成真的东西。记录 AI、编程、产品，以及那些不太完美但真实的进度。",
   productionUrl: "https://xulimeng2022.github.io/seqriver-portfolio/",
-  xUrl: "https://x.com/seqriver",
-  avatar: {
-    source: "./assets/avatar-source.png",
-    web: "./assets/avatar-720.jpg",
-    thumb: "./assets/avatar-256.jpg",
-    alt: "序川的 Q 版人物头像，深蓝头发、奶白外套，背景是青绿山川与河流",
+  xUrl: "https://x.com/page0lab",
+  xHandle: "@page0lab",
+  githubUrl: "https://github.com/xulimeng2022",
+  brand: {
+    image: "./assets/lingye-zero.png",
+    alt: "炭黑切面的汉字零，右下方由电光蓝像素继续构建",
   },
   hero: {
-    eyebrow: "AI · 编程 · 自动化",
-    lead: "用 AI 做点自己真正用得上的东西。",
-    intro: "在读大学生，记录 App、Agent 协作和学习工作流的实践。",
+    eyebrow: "大一学生 · AI · 编程 · 产品",
+    title: ["这里从第 0 页", "开始。"],
+    lead: "学着写代码，也学着把想法做成真的东西。",
+    intro: "记录 AI、产品，以及那些不太完美但真实的进度。",
   },
   about: {
     paragraphs: [
-      "我更喜欢从自己的真实需求出发。遇到重复、混乱或麻烦的事，就试着用 AI 和代码做一个小工具。",
-      "这个站点用来放我正在做和已经做出来的东西，也记录过程中的取舍、失败和下一步。",
-      "如果你也在折腾 AI、自动化或开发工作流，欢迎在 X 上继续交流。",
+      "我是零页，一名大一学生。正在学习编程，也尝试用 AI 和代码解决身边的真实问题。",
+      "遇到重复、混乱或麻烦的事，就从一个小工具开始。这里会记录做出来的东西，也记录失败、返工和刚学会的新东西。",
+      "如果你也在边学边做，欢迎一起往后翻。",
     ],
-    tags: ["AI 辅助开发", "Android App", "多 Agent", "自动化", "学习工作流"],
+    tags: ["学习编程", "AI 辅助开发", "做小产品", "整理知识"],
   },
-  // 没有已发布文章时保持空数组，构建结果会整体隐藏“记录”栏目和导航项。
+  // 只放真实已发布的记录；没有记录时仍保留章节导航并显示空状态。
   records: [],
   projects: [
     {

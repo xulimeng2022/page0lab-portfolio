@@ -1,14 +1,14 @@
 {
-  "name": "xuchuan-portfolio",
+  "name": "lingye-portfolio",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "序川的个人作品网站",
+  "description": "零页的学生 Builder 个人主页",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",
     "build:pages": "node scripts/build-pages.mjs",
-    "test": "node scripts/validate.mjs"
+    "test": "node --test tests/*.test.mjs && node scripts/validate.mjs"
   },
   "engines": {
     "node": ">=20"

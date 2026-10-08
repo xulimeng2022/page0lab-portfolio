@@ -26,9 +26,8 @@ export function buildSite({ outputDir = "dist" } = {}) {
   cpSync(path.join(root, "src", "app.js"), path.join(outDir, "app.js"));
   cpSync(path.join(root, "public", "assets"), path.join(outDir, "assets"), {
     recursive: true,
-    filter: (source) => !source.endsWith("avatar-source.png"),
+    filter: (source) => !path.basename(source).startsWith("avatar-"),
   });
-  cpSync(path.join(root, "public", "favicon.svg"), path.join(outDir, "favicon.svg"));
 
   return { outDir, html };
 }

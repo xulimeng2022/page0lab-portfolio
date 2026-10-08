@@ -1,6 +1,6 @@
 import { siteData } from "./site-data.mjs";
 
-// 转义来自资料的文本，避免生成阶段破坏 HTML 结构。
+// 资料以纯文本维护，统一转义后再写入页面。
 function escapeHtml(value = "") {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -10,262 +10,165 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#039;");
 }
 
-function renderExternalLink(url, label, className = "button button--ghost") {
+function externalLink(url, label, className = "text-link") {
   if (!url) return "";
-  return `<a class="${className}" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}<span aria-hidden="true">↗</span></a>`;
+  return `<a class="${className}" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
 }
 
-function renderMedia(media) {
-  if (media.type === "screenshot-group") {
-    const shots = media.items
-      .map(
-        (item, index) => `
-          <figure class="phone-shot phone-shot--${index + 1}">
-            <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt)}" width="720" height="1583" loading="lazy" decoding="async">
-          </figure>`,
-      )
-      .join("");
-
-    return `
-      <div class="media-card media-card--screens" aria-label="${escapeHtml(media.label)}">
-        <div class="media-label">${escapeHtml(media.label)}</div>
-        <div class="phone-stack">${shots}</div>
-      </div>`;
-  }
-
-  if (media.type === "concept-diagram") {
-    return `
-      <div class="media-card media-card--diagram" aria-label="${escapeHtml(media.label)}">
-        <div class="media-label">${escapeHtml(media.label)}</div>
-        <div class="bridge-diagram" role="img" aria-label="概念示意：Google Docs 在手机端编辑，进入 Drive Inbox，再同步到本地 Obsidian，并可反向刷新 Google Doc">
-          <div class="diagram-node diagram-node--doc">
-            <span class="diagram-icon" aria-hidden="true">✎</span>
-            <strong>Google Docs</strong>
-            <small>手机编辑</small>
-          </div>
-          <div class="diagram-flow" aria-hidden="true"><span>Inbox</span></div>
-          <div class="diagram-hub">
-            <span class="diagram-icon" aria-hidden="true">⌁</span>
-            <strong>Drive</strong>
-            <small>中转与状态</small>
-          </div>
-          <div class="diagram-flow diagram-flow--reverse" aria-hidden="true"><span>刷新</span></div>
-          <div class="diagram-node diagram-node--obsidian">
-            <span class="diagram-icon" aria-hidden="true">◇</span>
-            <strong>Obsidian</strong>
-            <small>唯一主库</small>
-          </div>
-          <p class="diagram-note">冲突不覆盖 · 不确定时人工确认</p>
-        </div>
-      </div>`;
-  }
-
-  if (media.type === "workflow-image") {
-    return `
-      <div class="media-card media-card--workflow">
-        <div class="media-label">${escapeHtml(media.label)}</div>
-        <img src="${escapeHtml(media.src)}" alt="${escapeHtml(media.alt)}" width="900" height="1620" loading="lazy" decoding="async">
-      </div>`;
-  }
-
-  return "";
+function chapterHeading(number, title, id, subtitle) {
+  return `<div class="chapter-heading">
+    <p class="chapter-number" aria-hidden="true">${number}</p>
+    <h2 id="${id}">${title}</h2>
+    <p class="chapter-subtitle">${subtitle}</p>
+  </div>`;
 }
 
-function renderProject(project) {
-  const points = project.points
-    .map((point) => `<li><span aria-hidden="true"></span>${escapeHtml(point)}</li>`)
-    .join("");
-  const facts = project.facts
-    .map((fact) => `<span>${escapeHtml(fact)}</span>`)
-    .join("");
-  const links = [
-    ["source", "GitHub 仓库"],
-    ["download", "查看下载"],
-    ["article", "阅读文章"],
-  ]
-    .filter(([key]) => project.links[key])
-    .map(([key, label]) => renderExternalLink(project.links[key], label, "text-link"))
-    .join("");
+function projectDetails(project) {
+  return `<details class="project-details">
+    <summary>实践过程与限制</summary>
+    <div class="details-body">
+      <p><strong>实践过程</strong>${escapeHtml(project.process)}</p>
+      <p><strong>当前限制</strong>${escapeHtml(project.limitations)}</p>
+    </div>
+  </details>`;
+}
 
-  return `
-    <article class="project project--${escapeHtml(project.id)} reveal" id="project-${escapeHtml(project.id)}">
-      <div class="project-media">${renderMedia(project.media)}</div>
+function projectLinks(project) {
+  return [["source", "查看源码"], ["download", "查看下载"], ["article", "阅读记录"]]
+    .map(([key, label]) => externalLink(project.links[key], label))
+    .join("");
+}
+
+function renderProjects(projects) {
+  return projects.map((project, index) => {
+    const featured = index === 0;
+    const screenshots = featured && project.media.type === "screenshot-group"
+      ? `<figure class="project-preview">
+          <div class="screenshot-pair">${project.media.items.slice(0, 2).map((item) =>
+            `<img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt)}" width="720" height="1583" loading="lazy" decoding="async">`
+          ).join("")}</div>
+          <figcaption>${escapeHtml(project.media.label)} · 已有版本</figcaption>
+        </figure>`
+      : "";
+    return `<article class="project${featured ? " project--featured" : ""}" id="project-${escapeHtml(project.id)}">
       <div class="project-copy">
-        <div class="project-topline">
-          <span class="project-index">${escapeHtml(project.index)}</span>
-          <span class="project-kicker">${escapeHtml(project.kicker)}</span>
-        </div>
+        <p class="project-kind">${escapeHtml(project.kicker)}</p>
         <h3>${escapeHtml(project.name)}</h3>
         <p class="project-summary">${escapeHtml(project.summary)}</p>
-        <p class="project-status"><span aria-hidden="true"></span>${escapeHtml(project.status)}</p>
-        <div class="project-facts">${facts}</div>
-        ${links ? `<div class="project-links">${links}</div>` : ""}
-        <ul class="project-points">${points}</ul>
-        <details class="project-details">
-          <summary>实践过程与限制</summary>
-          <div class="details-body">
-            <p><strong>实践过程</strong>${escapeHtml(project.process)}</p>
-            <p><strong>当前限制</strong>${escapeHtml(project.limitations)}</p>
-          </div>
-        </details>
+        <p class="project-status">${escapeHtml(project.status)}</p>
+        <div class="project-links">${projectLinks(project)}</div>
+        ${projectDetails(project)}
       </div>
+      ${screenshots}
     </article>`;
+  }).join("");
 }
 
-function renderRecords() {
-  if (!siteData.records.length) return { nav: "", section: "" };
-
-  const items = siteData.records
-    .map(
-      (record) => `
-        <article class="record reveal">
-          <time datetime="${escapeHtml(record.date)}">${escapeHtml(record.date)}</time>
-          <div>
-            <h3><a href="${escapeHtml(record.url)}">${escapeHtml(record.title)}<span aria-hidden="true">↗</span></a></h3>
-            <p>${escapeHtml(record.summary)}</p>
-          </div>
-        </article>`,
-    )
-    .join("");
-
-  return {
-    nav: '<a href="#records" data-section="records">记录</a>',
-    section: `
-      <section class="section records" id="records" aria-labelledby="records-title">
-        <div class="section-heading reveal">
-          <p class="section-label">RECORDS</p>
-          <h2 id="records-title">最近记录</h2>
-          <p>把已经发布、值得回看的实践整理在这里。</p>
-        </div>
-        <div class="record-list">${items}</div>
-      </section>`,
-  };
+function renderRecords(records) {
+  if (!records.length) {
+    return `<div class="records-empty">
+      <p class="empty-title">还没有发布构建日志。</p>
+      <p>这里会留下每一次尝试、取舍，以及下一步。</p>
+    </div>`;
+  }
+  return `<div class="record-list">${[...records]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map((record) => `<article class="record">
+      <div class="record-meta"><span>${escapeHtml(record.id || record.date)}</span><time datetime="${escapeHtml(record.date)}">${escapeHtml(record.date)}</time></div>
+      <div><h3>${record.url ? externalLink(record.url, record.title) : escapeHtml(record.title)}</h3><p>${escapeHtml(record.summary)}</p></div>
+    </article>`).join("")}</div>`;
 }
 
-function renderPage() {
-  const records = renderRecords();
-  const projectList = siteData.projects.map(renderProject).join("");
-  const tags = siteData.about.tags.map((tag) => `<li>${escapeHtml(tag)}</li>`).join("");
-  const aboutParagraphs = siteData.about.paragraphs
-    .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
-    .join("");
-  const xHero = renderExternalLink(siteData.xUrl, "在 X 找我", "button button--light");
-  const xAbout = renderExternalLink(siteData.xUrl, "在 X 继续交流", "text-link text-link--large");
-  const canonical = siteData.productionUrl
-    ? `<link rel="canonical" href="${escapeHtml(new URL(".", siteData.productionUrl).href)}">`
-    : "";
-  const ogUrl = siteData.productionUrl
-    ? `<meta property="og:url" content="${escapeHtml(new URL(".", siteData.productionUrl).href)}">`
-    : "";
-  const ogImage = siteData.productionUrl
-    ? `<meta property="og:image" content="${escapeHtml(new URL(siteData.avatar.web, siteData.productionUrl).href)}">`
-    : "";
-  const year = new Date().getFullYear();
+export function renderPage(data = siteData) {
+  const canonicalUrl = data.productionUrl ? new URL(".", data.productionUrl).href : "";
+  const shareImage = canonicalUrl ? new URL(data.brand.image, canonicalUrl).href : "";
+  const navigation = [["00", "top", "首页"], ["01", "projects", "正在构建"], ["02", "records", "构建日志"], ["03", "about", "关于"]]
+    .map(([number, id, label]) => `<a href="#${id}" data-section="${id}"${id === "top" ? ' aria-current="location"' : ""}><span class="nav-number" aria-hidden="true">${number}</span><span>${label}</span></a>`).join("");
 
   return `<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f7f3ea">
-    <title>${escapeHtml(siteData.title)}</title>
-    <meta name="description" content="${escapeHtml(siteData.description)}">
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-    <link rel="preload" href="${escapeHtml(siteData.avatar.web)}" as="image" fetchpriority="high">
+    <meta name="theme-color" content="#f7f5ef">
+    <title>${escapeHtml(data.title)}</title>
+    <meta name="description" content="${escapeHtml(data.description)}">
+    <link rel="icon" href="${escapeHtml(data.brand.image)}" type="image/png">
+    <link rel="preload" href="${escapeHtml(data.brand.image)}" as="image" fetchpriority="high">
     <link rel="stylesheet" href="./styles.css">
-    ${canonical}
+    ${canonicalUrl ? `<link rel="canonical" href="${escapeHtml(canonicalUrl)}">` : ""}
     <meta property="og:type" content="website">
-    <meta property="og:title" content="${escapeHtml(siteData.title)}">
-    <meta property="og:description" content="${escapeHtml(siteData.description)}">
+    <meta property="og:title" content="${escapeHtml(data.title)}">
+    <meta property="og:description" content="${escapeHtml(data.description)}">
     <meta property="og:locale" content="zh_CN">
-    ${ogUrl}
-    ${ogImage}
+    ${canonicalUrl ? `<meta property="og:url" content="${escapeHtml(canonicalUrl)}">` : ""}
+    ${shareImage ? `<meta property="og:image" content="${escapeHtml(shareImage)}">` : ""}
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="${escapeHtml(siteData.title)}">
-    <meta name="twitter:description" content="${escapeHtml(siteData.description)}">
-    <script>document.documentElement.classList.add('js');</script>
+    <meta name="twitter:title" content="${escapeHtml(data.title)}">
+    <meta name="twitter:description" content="${escapeHtml(data.description)}">
+    ${shareImage ? `<meta name="twitter:image" content="${escapeHtml(shareImage)}">` : ""}
     <script src="./app.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到主要内容</a>
     <header class="site-header" id="site-header">
-      <a class="brand" href="#top" aria-label="回到页面顶部">
-        <img src="${escapeHtml(siteData.avatar.thumb)}" alt="" width="256" height="256">
-        <span>${escapeHtml(siteData.name)}</span>
-      </a>
-      <nav class="site-nav" aria-label="主导航">
-        <a href="#projects" data-section="projects">作品</a>
-        ${records.nav}
-        <a href="#about" data-section="about">关于</a>
-      </nav>
+      <div class="header-inner">
+        <a class="brand" href="#top" aria-label="零页，回到首页">
+          <img src="${escapeHtml(data.brand.image)}" alt="" width="48" height="48">
+          <span>${escapeHtml(data.name)}</span>
+        </a>
+        <nav class="site-nav" aria-label="主导航">${navigation}</nav>
+      </div>
     </header>
 
-    <main id="main">
+    <main id="main" class="page">
       <section class="hero" id="top" aria-labelledby="hero-title">
-        <div class="hero-river" aria-hidden="true">
-          <svg viewBox="0 0 760 230" preserveAspectRatio="none">
-            <path d="M-20 180C130 30 246 214 410 92S642 24 790 150"/>
-            <path d="M-20 208C142 66 260 230 432 119S655 54 792 180"/>
-          </svg>
-        </div>
         <div class="hero-copy">
-          <p class="eyebrow reveal">${escapeHtml(siteData.hero.eyebrow)}</p>
-          <h1 id="hero-title" class="reveal">${escapeHtml(siteData.name)}</h1>
-          <p class="hero-lead reveal">${escapeHtml(siteData.hero.lead)}</p>
-          <p class="hero-intro reveal">${escapeHtml(siteData.hero.intro)}</p>
-          <div class="hero-actions reveal">
-            <a class="button button--primary" href="#projects">看看我的项目<span aria-hidden="true">↓</span></a>
-            ${xHero}
+          <p class="eyebrow">${escapeHtml(data.hero.eyebrow)}</p>
+          <h1 id="hero-title">${data.hero.title.map((line) => `<span>${escapeHtml(line)}</span>`).join("")}</h1>
+          <p class="hero-lead">${escapeHtml(data.hero.lead)}</p>
+          <p class="hero-intro">${escapeHtml(data.hero.intro)}</p>
+          <div class="hero-actions">
+            <a class="button" href="#projects">看我正在构建</a>
+            <a class="text-link" href="#records">读构建日志</a>
           </div>
         </div>
-        <figure class="portrait reveal">
-          <div class="portrait-frame">
-            <span class="portrait-orbit portrait-orbit--one" aria-hidden="true"></span>
-            <span class="portrait-orbit portrait-orbit--two" aria-hidden="true"></span>
-            <img src="${escapeHtml(siteData.avatar.web)}" alt="${escapeHtml(siteData.avatar.alt)}" width="720" height="720" fetchpriority="high" decoding="async">
-          </div>
-          <figcaption><span aria-hidden="true">⌁</span> 从自己的需求出发</figcaption>
+        <figure class="hero-art">
+          <img src="${escapeHtml(data.brand.image)}" alt="${escapeHtml(data.brand.alt)}" width="1024" height="1024" fetchpriority="high" decoding="async">
+          <figcaption>PAGE 0 — build from here.</figcaption>
         </figure>
+        <p class="hero-folio" aria-hidden="true">00 / 首页</p>
       </section>
 
-      <section class="section projects" id="projects" aria-labelledby="projects-title">
-        <div class="section-heading reveal">
-          <p class="section-label">SELECTED WORK</p>
-          <h2 id="projects-title">做过的东西</h2>
-          <p>优先展示真实成果、实际做法，以及还没有解决好的部分。</p>
-        </div>
-        <div class="project-list">${projectList}</div>
+      <section class="chapter projects" id="projects" aria-labelledby="projects-title">
+        ${chapterHeading("01", "正在构建", "projects-title", "从身边的问题开始。")}
+        <div class="project-list">${renderProjects(data.projects)}</div>
       </section>
 
-      ${records.section}
+      <section class="chapter records" id="records" aria-labelledby="records-title">
+        ${chapterHeading("02", "构建日志", "records-title", "不太完美，但真实。")}
+        ${renderRecords(data.records)}
+      </section>
 
-      <section class="section about" id="about" aria-labelledby="about-title">
-        <div class="about-copy reveal">
-          <p class="section-label">ABOUT</p>
-          <h2 id="about-title">关于序川</h2>
-          ${aboutParagraphs}
-          ${xAbout}
+      <section class="chapter about" id="about" aria-labelledby="about-title">
+        ${chapterHeading("03", "关于零页", "about-title", "边学边做，持续往后翻。")}
+        <div class="about-body">
+          <div class="about-copy">${data.about.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+            <div class="about-links">${externalLink(data.xUrl, "在 X 继续交流")}${externalLink(data.githubUrl, "GitHub")}</div>
+          </div>
+          <aside class="about-aside" aria-label="正在学习与探索">
+            <p class="aside-label">正在学习与探索</p>
+            <ul>${data.about.tags.map((tag) => `<li>${escapeHtml(tag)}</li>`).join("")}</ul>
+            <p class="aside-note">从一个小问题，到一个能用的东西。</p>
+          </aside>
         </div>
-        <aside class="about-side reveal" aria-label="关注方向">
-          <p>常在做的事</p>
-          <ul>${tags}</ul>
-        </aside>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <p>© ${year} ${escapeHtml(siteData.name)} · 把想法做成能用的东西</p>
-      <p>
-        ${siteData.xUrl ? `<a href="${escapeHtml(siteData.xUrl)}" target="_blank" rel="noopener noreferrer">X / @seqriver</a><span aria-hidden="true">·</span>` : ""}
-        <a href="https://deerflow.tech" target="_blank" rel="noopener noreferrer">Created By Deerflow</a>
-      </p>
+    <footer class="site-footer page">
+      <p>© ${new Date().getFullYear()} ${escapeHtml(data.name)} · 这里从第 0 页开始。</p>
+      <div>${externalLink(data.xUrl, `X / ${data.xHandle}`)}<a class="text-link" href="#top">回到第 0 页</a></div>
     </footer>
   </body>
-</html>`;
+</html>`.replace(/[ \t]+$/gm, "");
 }
-
-export { renderPage };
-
-
-
-

@@ -8,14 +8,15 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { outDir, html } = buildSite();
 const failures = [];
 const requiredText = [
-  "序川",
-  "用 AI 做点自己真正用得上的东西。",
+  "零页",
+  "学着写代码，也学着把想法做成真的东西。",
   "智能收纳助手",
   "Obsidian Bridge",
   "多 Agent 开发实践",
-  "https://x.com/seqriver",
+  "https://x.com/page0lab",
   "https://github.com/xulimeng2022/SmartStorageAssistant",
-  "Created By Deerflow",
+  "构建日志",
+  "关于零页",
 ];
 const forbiddenText = [
   "徐力萌",
@@ -24,6 +25,10 @@ const forbiddenText = [
   "xulimeng2022.github.io/app",
   "xulimeng2026",
   "cdn.jsdelivr.net",
+  "序川",
+  "@seqriver",
+  "avatar-720",
+  "avatar-256",
 ];
 
 for (const text of requiredText) {
@@ -34,8 +39,8 @@ for (const text of forbiddenText) {
   if (html.toLowerCase().includes(text.toLowerCase())) failures.push(`发现禁止内容: ${text}`);
 }
 
-if (!siteData.records.length && html.includes('href="#records"')) {
-  failures.push("文章列表为空时仍渲染了“记录”导航项");
+if (!siteData.records.length && !html.includes("还没有发布构建日志")) {
+  failures.push("日志列表为空时缺少真实空状态");
 }
 
 for (const bad of ['href=""', 'src=""']) {
@@ -44,15 +49,20 @@ for (const bad of ['href=""', 'src=""']) {
 
 const attributes = [...html.matchAll(/(?:href|src)="([^"]+)"/g)].map((match) => match[1]);
 for (const value of attributes) {
-  if (value.startsWith("#") || value.startsWith("https://") || value.startsWith("mailto:") || value.startsWith("data:")) {
+  if (value.startsWith("#")) {
+    if (!html.includes(`id="${value.slice(1)}"`)) failures.push(`章节链接没有目标: ${value}`);
+    continue;
+  }
+  if (value.startsWith("https://") || value.startsWith("mailto:") || value.startsWith("data:")) {
     continue;
   }
   const localPath = value.startsWith("/") ? value.slice(1) : value;
   if (!existsSync(path.join(outDir, localPath))) failures.push(`本地资源不存在: ${value}`);
 }
 
-const avatarSource = path.join(root, "public", "assets", "avatar-source.png");
-if (!existsSync(avatarSource)) failures.push("缺少头像原始文件");
+for (const asset of ["avatar-720.jpg", "avatar-256.jpg", "avatar-source.png"]) {
+  if (existsSync(path.join(outDir, "assets", asset))) failures.push(`构建产物仍包含旧头像: ${asset}`);
+}
 
 if (failures.length) {
   console.error("内容校验失败：");
