@@ -61,4 +61,6 @@ npm run build
 
 GitHub 仓库为 https://github.com/xulimeng2022/page0lab-portfolio，正式网站为 https://xulimeng2022.github.io/page0lab-portfolio/。仓库名与零页 X 账号 @page0lab 保持一致。
 
+本站是「零页」品牌站，记录 AI、编程、产品开发与真实构建过程。国内个人介绍站继续独立提供学习背景、技能、项目与联系方式，并保留 `/app/` 等项目页面。两站长期共存，各自保留正式 URL 与 canonical，不合并，也不将旧根站重定向到本站。个人站提供零页入口，零页站不设置返回个人站的入口。
+
 `docs/` 是 GitHub Pages 部署目录，使用 `npm run build:pages` 更新静态产物；推送到 `main` 后由 GitHub Pages 构建上线。Netlify 则使用现有 `netlify.toml`，发布目录为 `dist/`。
