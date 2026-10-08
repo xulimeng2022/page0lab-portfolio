@@ -7,7 +7,7 @@
 - 00 首页：个人定位、品牌主视觉和两个章节入口。
 - 01 正在构建：智能收纳助手的真实已有版本截图，其他工具与开发实践，以及可展开的过程和限制。
 - 02 构建日志：真实发布记录按日期倒序展示；当前没有已发布记录，显示空状态。
-- 03 关于：学生身份、学习与构建方式，以及 X / GitHub 联系入口与个人介绍站链接。
+- 03 关于：学生身份、学习与构建方式，以及 X / GitHub 联系入口。
 
 四个入口目前都是同一页的锚点。桌面与手机共用内容，导航随滚动和锚点切换高亮。关闭 JavaScript 后，正文、锚点和折叠详情仍可使用。
 
@@ -40,7 +40,6 @@ npm run build
 - `projects`：项目摘要、已有状态、真实截图、过程、限制和入口。
 - `xUrl` / `xHandle`：当前使用 https://x.com/page0lab / @page0lab。
 - `productionUrl`：分享元数据与 canonical 的正式地址。
-- `personalSiteUrl`：独立个人介绍站 https://xulimeng2022.github.io/，用于「关于」中的个人介绍入口。
 
 日志只添加真实已发布的内容。记录格式如下，编号发布后保持稳定：
 
@@ -62,6 +61,6 @@ npm run build
 
 GitHub 仓库为 https://github.com/xulimeng2022/page0lab-portfolio，正式网站为 https://xulimeng2022.github.io/page0lab-portfolio/。仓库名与零页 X 账号 @page0lab 保持一致。
 
-本站是「零页」品牌站，记录 AI、编程、产品开发与真实构建过程；[国内个人介绍站](https://xulimeng2022.github.io/) 继续介绍徐力萌的学习背景、技能、项目与联系方式，并保留 `/app/` 等项目页面。两站长期共存、相互链接，各自保留正式 URL 与 canonical，不合并，也不将旧根站重定向到本站。
+本站是「零页」品牌站，记录 AI、编程、产品开发与真实构建过程。国内个人介绍站继续独立提供学习背景、技能、项目与联系方式，并保留 `/app/` 等项目页面。两站长期共存，各自保留正式 URL 与 canonical，不合并，也不将旧根站重定向到本站。个人站提供零页入口，零页站不设置返回个人站的入口。
 
 `docs/` 是 GitHub Pages 部署目录，使用 `npm run build:pages` 更新静态产物；推送到 `main` 后由 GitHub Pages 构建上线。Netlify 则使用现有 `netlify.toml`，发布目录为 `dist/`。
